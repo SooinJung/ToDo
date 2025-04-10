@@ -1,3 +1,4 @@
+// 절대경로 설정하는 파일
 {
   "compilerOptions": {
     "target": "ES2017",
