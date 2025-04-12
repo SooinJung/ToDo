@@ -1,18 +1,32 @@
 'use client';
 
-import { FC } from 'react';
-import { Todo } from '@/types/todo'; 
+import { Todo } from '@/types/todo';
 
 interface Props {
   todo: Todo;
+  onToggle: (id: string, isCompleted: boolean) => void;
+  onDelete: (id: string) => void;
 }
 
-const TodoItem: FC<Props> = ({ todo }) => {
+export default function TodoItem({ todo, onToggle, onDelete }: Props) {
   return (
-    <li className="border border-gray-300 px-4 py-2 rounded bg-white shadow-sm">
-      {todo.name}
+    <li className="flex items-center justify-between gap-2 border border-gray-300 px-4 py-2 rounded bg-white shadow-sm">
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={todo.isCompleted}
+          onChange={() => onToggle(todo.id, !todo.isCompleted)}
+        />
+        <span className={todo.isCompleted ? 'line-through text-gray-400' : ''}>
+          {todo.name}
+        </span>
+      </div>
+      <button
+        onClick={() => onDelete(todo.id)}
+        className="text-red-500 text-sm hover:underline"
+      >
+        삭제
+      </button>
     </li>
   );
-};
-
-export default TodoItem;
+}
