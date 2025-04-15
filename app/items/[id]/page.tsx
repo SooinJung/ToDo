@@ -107,7 +107,7 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       style={{ minHeight: 'calc(100vh - 60px)' }}
     >
       {/* 제목 입력 */}
-      <div className="w-full max-w-2xl flex flex-col items-center mb-6 mt-6">
+      <div className="w-full max-w-3xl flex flex-col items-center mb-6 mt-6">
         <div className="box-border h-16 w-full bg-white border-2 border-[#0F172A] rounded-[24px] flex items-center px-3 sm:px-6">
           <input
             type="text"
@@ -125,9 +125,9 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       </div>
 
       {/* 이미지 + 메모 */}
-      <div className="w-full max-w-2xl flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full max-w-3xl items-stretch">
         {/* 이미지 */}
-        <div className="box-border w-full max-w-[300px] min-h-[180px] md:min-h-[261px] bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] rounded-[24px] flex flex-col items-center justify-center relative mx-auto mb-4 md:mb-0">
+        <div className="box-border w-full max-w-[300px] min-h-[180px] md:min-h-[261px] bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] rounded-[24px] flex flex-col flex-1 items-center justify-center relative mx-auto mb-4 md:mb-0 sm:w-[300px]">
           {(imagePreview || todo.imageUrl) ? (
             <div className="w-full h-full flex items-center justify-center relative">
               <img src={imagePreview || todo.imageUrl} alt="이미지 미리보기" className="max-w-full max-h-full object-contain rounded" />
@@ -180,7 +180,7 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       </div>
 
       {/* 버튼들 */}
-      <div className="relative flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 px-2 sm:px-6 w-full max-w-2xl">
+      <div className="relative flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-2 px-2 sm:px-6 w-full max-w-3xl pr-[10px]">
         <Button
           onClick={handleUpdate}
           disabled={isLoading}
