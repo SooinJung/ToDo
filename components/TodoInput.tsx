@@ -10,14 +10,16 @@ interface Props {
 }
 
 const TodoInput: FC<Props> = ({ value, onChange, onSubmit, todoCount }) => {
-  const buttonImage =
-    todoCount === 0
-      ? '/button/Add_Default.svg'
-      : '/button/Add_Active.svg';
+  // 입력값이 있으면 Active, 없으면 Default 이미지
+  const buttonImage = value.trim() !== '' 
+    ? '/button/Add_Active.svg'
+    : '/button/Add_Default.svg';
 
-  const isButtonDisabled = todoCount === 0;
-  const boxHeight = 40; // px
-  const buttonWidth = 140; // px
+  // 입력값이 없으면 버튼 비활성화
+  const isButtonDisabled = value.trim() === '';
+
+  const boxHeight = 40;
+  const buttonWidth = 140;
   const buttonHeight = 43;
 
   return (
@@ -31,7 +33,7 @@ const TodoInput: FC<Props> = ({ value, onChange, onSubmit, todoCount }) => {
         }}
       ></div>
       
-      {/* 안쪽 밝은 회색 박스 (버튼 공간만큼 width를 줄임) */}
+      {/* 안쪽 밝은 회색 박스 */}
       <div
         className="absolute left-0 top-0 flex items-center gap-4 px-4 z-10 bg-[#F1F5F9] border-2 border-[#0F172A] rounded-[24px] box-border"
         style={{
@@ -52,7 +54,8 @@ const TodoInput: FC<Props> = ({ value, onChange, onSubmit, todoCount }) => {
           }}
         />
       </div>
-      {/* 추가하기 버튼은 하얀 박스 바깥, 네이비 박스 위에 오른쪽에 배치 */}
+      
+      {/* 추가하기 버튼 */}
       <button
         onClick={onSubmit}
         className="absolute top-0 right-0 z-20 px-4 py-2 rounded"
@@ -69,6 +72,7 @@ const TodoInput: FC<Props> = ({ value, onChange, onSubmit, todoCount }) => {
       >
         추가하기
       </button>
+      
       {/* 높이 확보용 더미 div */}
       <div style={{ height: `${boxHeight + 3.5}px` }}></div>
     </div>
