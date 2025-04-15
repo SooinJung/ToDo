@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Todo } from '@/types/todo';
 import { API_URL } from '@/lib/constants';
 import Button from '@/components/Button';
+import Checkbox from '@/components/Checkbox';
 
 // 사진 유효성 검사 함수
 const isValidImage = (file: File) => {
@@ -49,7 +50,11 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return setImage(null), setImagePreview(null);
+    if (!file) {
+      setImage(null);
+      setImagePreview(null);
+      return;
+    }
 
     const { isValid, isValidName, isValidSize } = isValidImage(file);
     if (!isValid) {
@@ -66,7 +71,6 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  // 프론트엔드 상태만 업데이트 (백엔드 연동 없음)
   const handleUpdate = () => {
     if (!name.trim()) {
       alert('할 일 제목을 입력해주세요!');
@@ -87,7 +91,6 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
     alert('수정이 완료되었습니다!');
   };
 
-  // 삭제는 실제로는 목록으로 이동만
   const handleDelete = () => {
     if (!confirm('정말 삭제할 거야? 🥺')) return;
     router.push('/');
@@ -102,25 +105,23 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <main
-      className="flex flex-col items-center justify-start px-2 sm:px-4"
-      style={{ minHeight: 'calc(100vh - 60px)' }}
-    >
+    <main className="flex flex-col items-center justify-start px-2 sm:px-4" style={{ minHeight: 'calc(100vh - 60px)' }}>
       {/* 제목 입력 */}
-      <div className="w-full max-w-3xl flex flex-col items-center mb-6 mt-6">
-        <div className="box-border h-16 w-full bg-white border-2 border-[#0F172A] rounded-[24px] flex items-center px-3 sm:px-6">
+      <div className="w-full max-w-3xl flex flex-col items-center mb-6 mt-6 justify-center">
+        <div className="box-border h-16 w-full bg-white border-2 border-[#0F172A] rounded-[24px] flex items-center justify-center px-3 sm:px-6 gap-3 sm:gap-6">
+          {/* 체크박스 */}
+          <div className="flex items-center justify-center">
+            <Checkbox checked={isCompleted} onChange={(e) => setIsCompleted(e.target.checked)} />
+          </div>
+          {/* 제목 입력 */}
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 text-center font-medium border-none outline-none text-gray-700 bg-transparent text-base sm:text-lg"
+            className="flex-1 font-medium border-none outline-none text-gray-700 bg-transparent text-base sm:text-lg"
             placeholder="할 일을 입력하세요"
             required
           />
-          <label className="flex items-center gap-2 ml-2 sm:ml-4">
-            <input type="checkbox" checked={isCompleted} onChange={(e) => setIsCompleted(e.target.checked)} className="w-5 h-5" />
-            <span className="text-sm">완료됨</span>
-          </label>
         </div>
       </div>
 
@@ -130,7 +131,11 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
         <div className="box-border w-full max-w-[300px] min-h-[180px] md:min-h-[261px] bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] rounded-[24px] flex flex-col flex-1 items-center justify-center relative mx-auto mb-4 md:mb-0 sm:w-[300px]">
           {(imagePreview || todo.imageUrl) ? (
             <div className="w-full h-full flex items-center justify-center relative">
-              <img src={imagePreview || todo.imageUrl} alt="이미지 미리보기" className="max-w-full max-h-full object-contain rounded" />
+              <img
+                src={imagePreview || todo.imageUrl}
+                alt="이미지 미리보기"
+                className="max-w-full max-h-full object-contain rounded"
+              />
               <button
                 onClick={() => {
                   setImage(null);
@@ -162,7 +167,13 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
                 <label htmlFor="image-upload" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer">
                   <img src="/button/Plus.svg" alt="이미지 업로드" className="w-6 h-6" />
                 </label>
-                <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
             </>
           )}
