@@ -87,7 +87,7 @@ export default function Home() {
   };
 
   return (
-    <main className="max-w-[900px] mx-auto p-6"> {/* 여기서 max-w-md -> max-w-[700px]로 수정 */}
+    <main className="max-w-[900px] mx-auto p-6"> 
 
       <TodoInput 
         value={input} 
