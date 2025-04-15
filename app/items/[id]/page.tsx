@@ -66,53 +66,31 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleUpdate = async () => {
-    if (!name.trim()) return alert('할 일 제목을 입력해줘야 해요!');
-
-    setIsLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('isCompleted', JSON.stringify(isCompleted));
-      formData.append('memo', memo);
-      if (image) formData.append('image', image);
-
-      const res = await fetch(`${API_URL}/${params.id}`, {
-        method: 'PATCH',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || '수정 실패ㅠㅠ');
-      }
-
-      alert('수정 완료! 🎉');
-      router.push('/');
-    } catch (err) {
-      console.error(err);
-      alert('문제가 생겼어요. 다시 시도해줘요!');
-    } finally {
-      setIsLoading(false);
+  // 프론트엔드 상태만 업데이트 (백엔드 연동 없음)
+  const handleUpdate = () => {
+    if (!name.trim()) {
+      alert('할 일 제목을 입력해주세요!');
+      return;
     }
+
+    setTodo((prevTodo) => {
+      if (!prevTodo) return null;
+      return {
+        ...prevTodo,
+        name,
+        isCompleted,
+        memo,
+        imageUrl: imagePreview || prevTodo.imageUrl,
+      };
+    });
+
+    alert('수정이 완료되었습니다!');
   };
 
-  const handleDelete = async () => {
+  // 삭제는 실제로는 목록으로 이동만
+  const handleDelete = () => {
     if (!confirm('정말 삭제할 거야? 🥺')) return;
-
-    setIsLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/${params.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('삭제 실패ㅠㅠ');
-
-      alert('삭제 완료됐어요 🗑️');
-      router.push('/');
-    } catch (err) {
-      console.error(err);
-      alert('삭제 중 에러 발생... 다시 시도해줘요!');
-    } finally {
-      setIsLoading(false);
-    }
+    router.push('/');
   };
 
   if (!todo) {
@@ -124,19 +102,22 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <main className="flex flex-col items-center justify-start" style={{ minHeight: 'calc(100vh - 60px)' }}>
+    <main
+      className="flex flex-col items-center justify-start px-2 sm:px-4"
+      style={{ minHeight: 'calc(100vh - 60px)' }}
+    >
       {/* 제목 입력 */}
-      <div className="w-full max-w-[800px] flex flex-col items-center mb-8 mt-8">
-        <div className="box-border h-[60px] w-full bg-white border-2 border-[#0F172A] rounded-[24px] flex items-center px-6">
+      <div className="w-full max-w-2xl flex flex-col items-center mb-6 mt-6">
+        <div className="box-border h-16 w-full bg-white border-2 border-[#0F172A] rounded-[24px] flex items-center px-3 sm:px-6">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 text-center font-medium border-none outline-none text-gray-700 bg-transparent text-lg"
+            className="flex-1 text-center font-medium border-none outline-none text-gray-700 bg-transparent text-base sm:text-lg"
             placeholder="할 일을 입력하세요"
             required
           />
-          <label className="flex items-center gap-2 ml-4">
+          <label className="flex items-center gap-2 ml-2 sm:ml-4">
             <input type="checkbox" checked={isCompleted} onChange={(e) => setIsCompleted(e.target.checked)} className="w-5 h-5" />
             <span className="text-sm">완료됨</span>
           </label>
@@ -144,26 +125,42 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       </div>
 
       {/* 이미지 + 메모 */}
-      <div className="w-full max-w-[800px] flex flex-col md:flex-row gap-6 mb-8">
+      <div className="w-full max-w-2xl flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
         {/* 이미지 */}
-        <div className="box-border w-[800px] h-[261px] bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] rounded-[24px] flex flex-col items-center justify-center relative mx-auto">
+        <div className="box-border w-full max-w-[300px] min-h-[180px] md:min-h-[261px] bg-[#F8FAFC] border-2 border-dashed border-[#CBD5E1] rounded-[24px] flex flex-col items-center justify-center relative mx-auto mb-4 md:mb-0">
           {(imagePreview || todo.imageUrl) ? (
             <div className="w-full h-full flex items-center justify-center relative">
               <img src={imagePreview || todo.imageUrl} alt="이미지 미리보기" className="max-w-full max-h-full object-contain rounded" />
-              <button onClick={() => { setImage(null); setImagePreview(null); }} className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow" title="이미지 삭제">
+              <button
+                onClick={() => {
+                  setImage(null);
+                  setImagePreview(null);
+                }}
+                className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow"
+                title="이미지 삭제"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </button>
             </div>
           ) : (
             <>
-              <svg className="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
               <div className="absolute bottom-4 right-4">
-                <label htmlFor="image-upload" className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer">
-                  <span className="text-xl">+</span>
+                <label htmlFor="image-upload" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer">
+                  <img src="/button/Plus.svg" alt="이미지 업로드" className="w-6 h-6" />
                 </label>
                 <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </div>
@@ -172,39 +169,23 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* 메모 */}
-        <div className="relative w-[988px] h-[261px] bg-[#FEFCE8] overflow-hidden rounded-xl shadow-lg">
-          <div className="absolute w-[717.34px] h-[512px] -left-[21.34px] top-[22px] pointer-events-none" />
-          <div className="absolute w-[696px] h-[311px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FEFCE8]" />
-          {[...Array(14)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute border border-[#FEF3C7]"
-              style={{
-                width: '0px',
-                height: '717.34px',
-                left: '696px',
-                bottom: `${-345.34 - i * 32}px`,
-                transform: 'rotate(90deg)',
-                borderWidth: i < 2 ? '4px' : '2px',
-              }}
-            />
-          ))}
+        <div className="relative w-full flex-1 min-h-[180px] md:min-h-[261px] bg-[#FEFCE8] overflow-hidden rounded-xl shadow-lg">
           <textarea
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
-            className="absolute top-0 left-0 w-full h-full bg-transparent p-6 text-gray-800 text-base resize-none z-10 leading-8 outline-none"
+            className="absolute top-0 left-0 w-full h-full bg-transparent p-4 sm:p-6 text-gray-800 text-base resize-none z-10 leading-7 outline-none"
             placeholder="오메가3, 프로폴리스, 아연 챙겨먹기"
           />
         </div>
       </div>
 
-      {/* 버튼 */}
-      <div className="flex justify-center gap-4 mt-8">
+      {/* 버튼들 */}
+      <div className="relative flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 px-2 sm:px-6 w-full max-w-2xl">
         <Button
           onClick={handleUpdate}
           disabled={isLoading}
           aria-label="수정 완료"
-          className={`w-32 h-12 rounded-full shadow ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`w-full sm:w-32 h-10 sm:h-12 rounded-full shadow ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           style={{
             background: `url(${editButtonImage}) no-repeat center/contain`,
             color: 'transparent',
@@ -217,7 +198,7 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
           onClick={handleDelete}
           disabled={isLoading}
           aria-label="삭제하기"
-          className={`w-32 h-12 rounded-full shadow ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`w-full sm:w-32 h-10 sm:h-12 rounded-full shadow ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           style={{
             background: `url(${deleteButtonImage}) no-repeat center/contain`,
             color: 'transparent',
