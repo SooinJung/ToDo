@@ -88,10 +88,6 @@ export default function Home() {
 
   return (
     <main className="max-w-[900px] mx-auto p-6"> {/* 여기서 max-w-md -> max-w-[700px]로 수정 */}
-      <div className="flex items-center mb-4">
-        <img src="/img/todo.svg" alt="Todo List" className="w-8 h-8 mr-2" />
-        <span className="text-2xl font-bold text-primarytext">Todo List</span>
-      </div>
 
       <TodoInput 
         value={input} 
