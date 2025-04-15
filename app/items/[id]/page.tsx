@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Todo } from '@/types/todo';
 import { API_URL } from '@/lib/constants';
+import Button from '@/components/Button';
+
 
 // 사진 유효성 검사 함수 선언
 function isValidImage(file: File) {
@@ -34,17 +36,33 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   const handleUpdate = async () => {
+    // 이미지, 파일명, 용량 등 조건 체크
+    if (image) {
+      const fileNameIsValid = /^[a-zA-Z0-9_.-]+$/.test(image.name);
+      const fileSizeIsValid = image.size <= 5 * 1024 * 1024; // 5MB
+  
+      if (!fileNameIsValid) {
+        alert('이미지 파일 이름은 영어와 숫자, 언더스코어, 하이픈만 사용해주세요!');
+        return;
+      }
+  
+      if (!fileSizeIsValid) {
+        alert('이미지 용량은 5MB 이하만 가능합니다!');
+        return;
+      }
+    }
+  
     const formData = new FormData();
     formData.append('name', name);
     formData.append('isCompleted', JSON.stringify(isCompleted));
     formData.append('memo', memo);
     if (image) formData.append('image', image);
-
+  
     const res = await fetch(`${API_URL}/${params.id}`, {
       method: 'PATCH',
       body: formData,
     });
-
+  
     if (res.ok) {
       alert('수정 완료!');
       router.push('/');
@@ -52,6 +70,7 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       alert('수정 실패!');
     }
   };
+  
 
   const handleDelete = async () => {
     const res = await fetch(`${API_URL}/${params.id}`, { method: 'DELETE' });
@@ -125,12 +144,7 @@ export default function TodoDetailPage({ params }: { params: { id: string } }) {
       )}
     
       <div className="flex justifiy-end gap-2 my-4">
-        <button
-          onClick={handleUpdate}
-          className="bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600"
-        >
-          수정 완료
-        </button>
+        <Button onClick={handleUpdate}> 수정 완료 </Button>
         <button
           onClick={handleDelete}
           className="bg-red-500 text-white px-5 py-2 rounded-full shadow hover:bg-red-600"

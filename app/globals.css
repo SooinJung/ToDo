@@ -5,8 +5,8 @@
   
 /* ✅ 글로벌 스타일 설정 */
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--background);
+  font-family: 'NanumSquare';
+  background: #fff;
   color: var(--foreground);
 }
 
